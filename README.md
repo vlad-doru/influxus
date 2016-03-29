@@ -67,3 +67,9 @@ When passing an empty string for the InfluxDB database name, we default to "logr
 
 We will insert your message into InfluxDB with the field message.
 
+TODO
+---
+
+- [x] Concurrent, non-blocking design.
+- [  ] Add unit tests
+- [  ] Set up continous integration.
