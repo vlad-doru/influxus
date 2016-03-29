@@ -71,5 +71,5 @@ TODO
 ---
 
 - [x] Concurrent, non-blocking design.
-- [  ] Add unit tests
-- [  ] Set up continous integration.
+- [ ] Add unit tests
+- [ ] Set up continous integration.
