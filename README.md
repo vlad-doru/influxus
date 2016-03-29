@@ -1,4 +1,4 @@
-Influxus
+Influxus [![GoDoc](https://godoc.org/github.com/vlad-doru/influxus?status.svg)](https://godoc.org/github.com/vlad-doru/influxus)
 ===
 
 Golang Hook for the [Logrus](https://github.com/Sirupsen/logrus) logging library, in order to output logs to [InfluxDB](https://influxdata.com/).

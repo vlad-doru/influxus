@@ -24,9 +24,10 @@ type Config struct {
 	Precision          string
 	Database           string
 	DefaultMeasurement string
-	Tags               []string
-	BatchInterval      int // seconds
-	BatchSize          int
+	// Tags that we will extract from the log fields and set them as Influx point tags.
+	Tags          []string
+	BatchInterval int // seconds
+	BatchSize     int
 }
 
 func (config *Config) setDefaults() {
