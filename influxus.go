@@ -9,11 +9,15 @@ import (
 )
 
 const (
-	LevelTag         = "level"
-	MessageField     = "message"
+	// LevelTag represents the name of the tag that will have the log level assigned.
+	LevelTag = "level"
+	// MessageField represents the name of the fields that we will assign the log message to.
+	MessageField = "message"
+	// MeasurementField represents the name of the field that we will get the measurement from the log fields.
 	MeasurementField = "measurement"
 )
 
+// Hook represents the Logrus hook to InfluxDB.
 type Hook struct {
 	config Config
 
@@ -21,6 +25,7 @@ type Hook struct {
 	comm chan *influx.Point
 }
 
+// NewHook generate a new InfluxDB hook based on the given configuration.
 func NewHook(config *Config) (*Hook, error) {
 	if config == nil {
 		return nil, fmt.Errorf("Influxus configuration passed to InfluxDB is nil.")
@@ -80,6 +85,7 @@ func (hook *Hook) spawnBatchHandler() {
 	go hook.spawnBatchHandler()
 }
 
+// Fire represents the interface that we must have implemented for the Logrus Hook.
 func (hook *Hook) Fire(entry *logrus.Entry) (err error) {
 	// Create a new InfluxDB points and send it for processing.
 	entry.Data[MessageField] = entry.Message

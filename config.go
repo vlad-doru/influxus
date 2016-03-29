@@ -5,13 +5,20 @@ import (
 )
 
 const (
-	PrecisionDefault        = "ns"
-	DatabaseDefault         = "logrus"
+	// PrecisionDefault represents the default precision used for the InfluxDB points.
+	PrecisionDefault = "ns"
+	// DatabaseDefault is the default database that we will write to, if not specified otherwise in the Config for the hook.
+	DatabaseDefault = "logrus"
+	// DefaultMeasurementValue is the default measurement that we will assign to each point, unless there is a field called "measurement".
 	DefaultMeasurementValue = "logrus"
-	BatchIntervalDefault    = 5
-	BatchSizeDefault        = 100
+	// BatchIntervalDefault represents the number of seconds that we wait for a batch to fill up.
+	// After that we flush it to InfluxDB whatsoever.
+	BatchIntervalDefault = 5
+	// BatchSizeDefault represents the maximum size of a batch.
+	BatchSizeDefault = 100
 )
 
+// Config is the struct that we will use to configure our Influxus hook to Logrus.
 type Config struct {
 	Client             influx.Client
 	Precision          string
