@@ -5,20 +5,21 @@ import (
 )
 
 const (
-	PrecisionDefault     = "ns"
-	DatabaseDefault      = "logrus"
-	BatchIntervalDefault = 5
-	BatchSizeDefault     = 100
+	PrecisionDefault        = "ns"
+	DatabaseDefault         = "logrus"
+	DefaultMeasurementValue = "logrus"
+	BatchIntervalDefault    = 5
+	BatchSizeDefault        = 100
 )
 
 type Config struct {
-	Client    influx.Client
-	Precision string
-	Database  string
-	Tags      []string
-	// BatchInterval in seconds.
-	BatchInterval int
-	BatchSize     int
+	Client             influx.Client
+	Precision          string
+	Database           string
+	DefaultMeasurement string
+	Tags               []string
+	BatchInterval      int // seconds
+	BatchSize          int
 }
 
 func (config *Config) setDefaults() {
@@ -27,6 +28,9 @@ func (config *Config) setDefaults() {
 	}
 	if config.Database == "" {
 		config.Database = DatabaseDefault
+	}
+	if config.DefaultMeasurement == "" {
+		config.DefaultMeasurement = DefaultMeasurementValue
 	}
 	if config.BatchInterval <= 0 {
 		config.BatchInterval = BatchIntervalDefault

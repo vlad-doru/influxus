@@ -9,11 +9,9 @@ import (
 )
 
 const (
-	LevelTag     = "level"
-	MessageField = "message"
-	MetricField  = "metric"
-
-	DefaultMetricField = "logrus"
+	LevelTag         = "level"
+	MessageField     = "message"
+	MeasurementField = "measurement"
 )
 
 type Hook struct {
@@ -23,7 +21,7 @@ type Hook struct {
 	comm chan *influx.Point
 }
 
-func NewInfluxusHook(config *Config) (*Hook, error) {
+func NewHook(config *Config) (*Hook, error) {
 	if config == nil {
 		return nil, fmt.Errorf("Influxus configuration passed to InfluxDB is nil.")
 	}
@@ -37,7 +35,7 @@ func NewInfluxusHook(config *Config) (*Hook, error) {
 	// Make a buffered channel so that senders will not block.
 	hook.comm = make(chan *influx.Point, config.BatchSize)
 	// Spawn a worker goroutine to handle the first batch.
-	hook.spawnBatchHandler()
+	go hook.spawnBatchHandler()
 	return hook, nil
 }
 
@@ -54,36 +52,40 @@ func (hook *Hook) spawnBatchHandler() {
 		Precision: hook.config.Precision,
 	})
 	if err != nil {
-		logrus.Fatalf("Could not generate an InfluxDB batch of points: %v", err)
+		logrus.Errorf("Could not generate an InfluxDB batch of points: %v", err)
 	}
 	batchSize := 0
 	for true {
+		cont := true
 		select {
 		case <-interval:
 			// It means we have reached the batch interval duration.
-			break
+			cont = false
 		case point := <-hook.comm:
 			batch.AddPoint(point)
 			batchSize++
 			if batchSize == hook.config.BatchSize {
-				break
+				cont = false
 			}
+		}
+		if cont == false {
+			break
 		}
 	}
 	err = hook.config.Client.Write(batch)
 	if err != nil {
-		logrus.Errorf("Could not write batch of points to InfluxDB: %v", err)
+		logrus.Fatalf("Could not write batch of points to InfluxDB: %v", err)
 	}
 	// After we tried to write the batch we spawn a new batch handler.
-	hook.spawnBatchHandler()
+	go hook.spawnBatchHandler()
 }
 
 func (hook *Hook) Fire(entry *logrus.Entry) (err error) {
 	// Create a new InfluxDB points and send it for processing.
 	entry.Data[MessageField] = entry.Message
 
-	metric := DefaultMetricField
-	if result, ok := getTag(entry.Data, MetricField); ok {
+	metric := hook.config.DefaultMeasurement
+	if result, ok := getTag(entry.Data, MeasurementField); ok {
 		metric = result
 	}
 
