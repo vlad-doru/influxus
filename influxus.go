@@ -104,6 +104,11 @@ func (hook *Hook) Fire(entry *logrus.Entry) (err error) {
 			tags[tag] = tagValue
 		}
 	}
+	// We should remove the tags from the fields, as fields and tags with the same value
+	// do not play nicely in InfluxDB.
+	for _, tag := range hook.config.Tags {
+		delete(entry.Data, tag)
+	}
 
 	pt, err := influx.NewPoint(metric, tags, entry.Data, entry.Time)
 	if err != nil {
