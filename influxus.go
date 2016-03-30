@@ -106,11 +106,15 @@ func (hook *Hook) Fire(entry *logrus.Entry) (err error) {
 	}
 	// We should remove the tags from the fields, as fields and tags with the same value
 	// do not play nicely in InfluxDB.
+	fields := map[string]interface{}{}
+	for k, v := range entry.Data {
+		fields[k] = v
+	}
 	for _, tag := range hook.config.Tags {
-		delete(entry.Data, tag)
+		delete(fields, tag)
 	}
 
-	pt, err := influx.NewPoint(metric, tags, entry.Data, entry.Time)
+	pt, err := influx.NewPoint(metric, tags, fields, entry.Time)
 	if err != nil {
 		return fmt.Errorf("Cannot add InfluxDB point in Influxus Hook: %v", err)
 	}
